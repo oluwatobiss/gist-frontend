@@ -167,7 +167,7 @@ export default function SignUp() {
         )}
         <button
           type="submit"
-          className="cursor-pointer hover:bg-gray-200 hover:text-black mt-3 px-7 py-2 border border-gray-400 border-solid rounded-sm"
+          className="cursor-pointer rounded-lg border border-solid border-transparent transition-colors bg-foreground text-background hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 mt-3 px-4 sm:px-5"
         >
           Sign up
         </button>
