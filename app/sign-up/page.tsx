@@ -1,8 +1,23 @@
 "use client";
 import { useState } from "react";
-import { ChangeEvent, Errors, FormEvent } from "@/app/_types";
+import { useRouter } from "next/navigation";
+import { ChangeEvent, Errors, FormEvent, PostUserOption } from "@/app/_types";
+import useSWRMutation from "swr/mutation";
+
+// const fetcher = (url: URL, options?: RequestInit) =>
+//   fetch(url, options).then((res) => res.json());
+
+async function postUserData(url: string, { arg }: PostUserOption) {
+  const response = await fetch(url, {
+    method: "POST",
+    body: JSON.stringify(arg),
+    headers: { "Content-type": "application/json; charset=UTF-8" },
+  });
+  return await response.json();
+}
 
 export default function SignUp() {
+  const router = useRouter();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
@@ -11,31 +26,31 @@ export default function SignUp() {
   const [admin, setAdmin] = useState(false);
   const [adminCode, setAdminCode] = useState("");
   const [errors, setErrors] = useState<Errors[]>([]);
+  const { trigger, isMutating, data, error } = useSWRMutation(
+    `${process.env.NEXT_PUBLIC_BACKEND_URI}/users`,
+    postUserData
+  );
 
   async function registerUser(e: FormEvent) {
     e.preventDefault();
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URI}/users`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            firstName,
-            lastName,
-            username,
-            email,
-            password,
-            admin,
-            adminCode,
-          }),
-          headers: { "Content-type": "application/json; charset=UTF-8" },
-        }
-      );
-      const userData = await response.json();
-      userData.errors?.length
-        ? setErrors(userData.errors)
-        : (window.location.href = "/");
+      const result = await trigger({
+        firstName,
+        lastName,
+        username,
+        email,
+        password,
+        admin,
+        adminCode,
+      });
+      console.log("=== registerUser result ===");
+      console.log(result);
+      console.log("=== registerUser useSWRMutation data  ===");
+      console.log(data);
+      result.errors?.length ? setErrors(result.errors) : router.push("/");
     } catch (error) {
+      console.log("=== registerUser error ===");
+      console.log(error);
       if (error instanceof Error) console.error(error.message);
     }
   }
@@ -56,7 +71,7 @@ export default function SignUp() {
   }
 
   return (
-    <main className="sm:px-100 sm:py-20 min-h-screen font-[family-name:var(--font-geist-sans)]">
+    <main className="sm:px-[30%] sm:py-20 min-h-screen font-[family-name:var(--font-geist-sans)]">
       <form
         className="[&_.text-input]:w-full [&_input]:border [&_input]:border-gray-500 [&_input]:rounded-sm [&_input]:my-1 [&_input]:px-5 [&_input]:py-2 [&_input]:text-lg [&_label]:inline-block [&_label]:text-sm [&_.text-input-label]:mt-3"
         onSubmit={registerUser}
@@ -167,10 +182,21 @@ export default function SignUp() {
         )}
         <button
           type="submit"
+          disabled={isMutating}
           className="cursor-pointer rounded-lg border border-solid border-transparent transition-colors bg-foreground text-background hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 mt-3 px-4 sm:px-5"
         >
           Sign up
         </button>
+        {isMutating && (
+          <div className="my-3 text-sm text-yellow-300">
+            Registration in progress...
+          </div>
+        )}
+        {error && (
+          <div className="my-3 text-sm text-red-500">
+            Error: {error.message}
+          </div>
+        )}
       </form>
     </main>
   );
