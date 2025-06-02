@@ -7,7 +7,7 @@ import useSWRMutation from "swr/mutation";
 // const fetcher = (url: URL, options?: RequestInit) =>
 //   fetch(url, options).then((res) => res.json());
 
-async function postUserData(url: string, { arg }: PostUserOption) {
+async function postUser(url: string, { arg }: PostUserOption) {
   const response = await fetch(url, {
     method: "POST",
     body: JSON.stringify(arg),
@@ -28,7 +28,7 @@ export default function SignUp() {
   const [errors, setErrors] = useState<Errors[]>([]);
   const { trigger, isMutating, data, error } = useSWRMutation(
     `${process.env.NEXT_PUBLIC_BACKEND_URI}/users`,
-    postUserData
+    postUser
   );
 
   async function registerUser(e: FormEvent) {
