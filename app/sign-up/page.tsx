@@ -4,9 +4,6 @@ import { useRouter } from "next/navigation";
 import { ChangeEvent, Errors, FormEvent, PostUserOption } from "@/app/_types";
 import useSWRMutation from "swr/mutation";
 
-// const fetcher = (url: URL, options?: RequestInit) =>
-//   fetch(url, options).then((res) => res.json());
-
 async function postUser(url: string, { arg }: PostUserOption) {
   const response = await fetch(url, {
     method: "POST",

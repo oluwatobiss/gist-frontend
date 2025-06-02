@@ -1,7 +1,8 @@
 type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
-type FormEvent = React.FormEvent<HTMLFormElement>;
+type DeleteUserOptions = { userId: number; userToken: string | false | null };
 type Errors = { msg: string; path: string };
-type GetUsersOption = { url: string; userToken: string };
+type FormEvent = React.FormEvent<HTMLFormElement>;
+type GetUsersOptions = { url: string; userToken: string };
 type PostUserArg = {
   firstName: string;
   lastName: string;
@@ -25,9 +26,10 @@ type User = {
 
 export type {
   ChangeEvent,
+  DeleteUserOptions,
   Errors,
   FormEvent,
-  GetUsersOption,
+  GetUsersOptions,
   PostUserOption,
   PostUserAuthOption,
   User,

@@ -1,44 +1,46 @@
 "use client";
-import { useState } from "react";
-import { GetUsersOption, User } from "@/app/_types";
+import { useRouter } from "next/navigation";
+import { DeleteUserOptions, GetUsersOptions, User } from "@/app/_types";
 import useSWR from "swr";
+import useSWRMutation from "swr/mutation";
 
-async function getUsers({ url, userToken }: GetUsersOption) {
+async function getUsers({ url, userToken }: GetUsersOptions) {
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${userToken}` },
   });
-  const myTest = await response.json();
+  return await response.json();
+}
 
-  console.log("=== getUsers function ===");
-  console.log(myTest);
-
-  return myTest;
+async function deleteUser(url: string, { arg }: { arg: DeleteUserOptions }) {
+  const response = await fetch(`${url}/${arg.userId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${arg.userToken}` },
+  });
+  return await response.json();
 }
 
 export default function Dashboard() {
+  const router = useRouter();
+  const backendUri = process.env.NEXT_PUBLIC_BACKEND_URI;
   const userToken =
     typeof window !== "undefined" && localStorage.getItem("gistToken");
   const loggedInUserJson =
     typeof window !== "undefined" && localStorage.getItem("gistUserData");
   const loggedInUser = loggedInUserJson && JSON.parse(loggedInUserJson);
-  const backendUri = process.env.NEXT_PUBLIC_BACKEND_URI;
-  const [loading, setLoading] = useState(false);
-  const [reload, setReload] = useState(false);
   const { data, error, isLoading } = useSWR(
     { url: `${backendUri}/users/?status=${loggedInUser.status}`, userToken },
     getUsers
   );
+  const { trigger, isMutating } = useSWRMutation(
+    `${backendUri}/users`,
+    deleteUser
+  );
 
-  async function deleteUser(userId: number) {
+  async function removeUser(userId: number) {
     try {
       if (confirm("Delete user permanently?")) {
-        setLoading(true);
-        await fetch(`${backendUri}/users/${userId}`, {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${userToken}` },
-        });
-        setReload(!reload);
-        setLoading(false);
+        await trigger({ userId, userToken });
+        router.refresh();
       }
     } catch (error) {
       if (error instanceof Error) console.error(error.message);
@@ -64,11 +66,12 @@ export default function Dashboard() {
             ""
           ) : (
             <button
+              disabled={isMutating}
               type="button"
               className="cursor-pointer rounded-lg border border-solid border-transparent transition-colors bg-foreground text-background hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 mt-3 px-4 sm:px-5"
-              onClick={() => deleteUser(user.id)}
+              onClick={() => removeUser(user.id)}
             >
-              Delete
+              {isMutating ? "Deleting user..." : "Delete"}
             </button>
           )}
         </div>
