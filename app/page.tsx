@@ -1,10 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function Home() {
-  const router = useRouter();
   const [userToken, setUserToken] = useState("");
 
   function logoutUser() {
@@ -24,9 +22,9 @@ export default function Home() {
       <div>
         <Link
           className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 mb-3 px-4 sm:px-5 sm:w-auto"
-          href="/sign-up"
+          href={userToken ? "/chat-room" : "/sign-up"}
         >
-          Sign up
+          {userToken ? "Join the latest chat" : "Sign up"}
         </Link>
         {!userToken && (
           <Link
