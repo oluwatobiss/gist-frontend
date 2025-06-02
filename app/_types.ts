@@ -11,5 +11,12 @@ type PostUserArg = {
   adminCode: string;
 };
 type PostUserOption = { arg: PostUserArg };
+type PostUserAuthOption = { arg: { email: string; password: string } };
 
-export type { ChangeEvent, Errors, FormEvent, PostUserOption };
+export type {
+  ChangeEvent,
+  Errors,
+  FormEvent,
+  PostUserOption,
+  PostUserAuthOption,
+};
