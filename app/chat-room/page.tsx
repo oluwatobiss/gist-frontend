@@ -20,12 +20,18 @@ const userName = "yellow";
 const userToken =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoieWVsbG93LW1vdXNlLTgiLCJleHAiOjE3NDg5Nzg1ODl9.PSCR87KiCqXTOgiMcBgh3Pp2_48fZI4cLDsMinDDwBc";
 
+const user: User = {
+  id: userId,
+  name: userName,
+  image: `https://getstream.io/random_png/?name=${userName}`,
+};
+
 export default function ChatRoom() {
   const [channel, setChannel] = useState<StreamChannel>();
   const client = useCreateChatClient({
     apiKey,
     tokenOrProvider: userToken,
-    userData: { id: userId, name: userName },
+    userData: user,
   });
 
   useEffect(() => {
