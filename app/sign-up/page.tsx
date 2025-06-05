@@ -44,7 +44,7 @@ export default function SignUp() {
       console.log(result);
       console.log("=== registerUser useSWRMutation data  ===");
       console.log(data);
-      result.errors?.length ? setErrors(result.errors) : router.push("/");
+      result.errors?.length ? setErrors(result.errors) : router.push("/login");
     } catch (error) {
       console.log("=== registerUser error ===");
       console.log(error);

@@ -27,6 +27,10 @@ export default function Login() {
     e.preventDefault();
     try {
       const result = await trigger({ email, password });
+
+      console.log("=== authenticateUser ===");
+      console.log(result);
+
       localStorage.setItem("gistToken", result.token);
       localStorage.setItem("gistUserData", JSON.stringify(result.payload));
       result.errors?.length ? setErrors(result.errors) : router.push("/");
