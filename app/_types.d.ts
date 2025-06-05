@@ -11,6 +11,7 @@ type DeleteUserOptions = { userId: number; userToken: string | false | null };
 type Errors = { msg: string; path: string };
 type FormEvent = React.FormEvent<HTMLFormElement>;
 type GetUsersOptions = { url: string; userToken: string };
+type loggedInUser = { id: number; username: string; status: string };
 type PostUserArg = {
   firstName: string;
   lastName: string;
@@ -38,6 +39,7 @@ export type {
   Errors,
   FormEvent,
   GetUsersOptions,
+  loggedInUser,
   PostUserOption,
   PostUserAuthOption,
   User,

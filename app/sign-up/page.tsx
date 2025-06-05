@@ -195,6 +195,12 @@ export default function SignUp() {
           </div>
         )}
       </form>
+      <div className="mt-3 text-sm">
+        <span>Already have an account? </span>
+        <a className="text-blue-300 hover:text-blue-500" href="/login">
+          Login
+        </a>
+      </div>
     </main>
   );
 }

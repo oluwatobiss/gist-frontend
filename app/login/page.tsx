@@ -32,6 +32,7 @@ export default function Login() {
       console.log(result);
 
       localStorage.setItem("gistToken", result.token);
+      localStorage.setItem("streamToken", result.streamToken);
       localStorage.setItem("gistUserData", JSON.stringify(result.payload));
       result.errors?.length ? setErrors(result.errors) : router.push("/");
     } catch (error) {
@@ -97,6 +98,12 @@ export default function Login() {
           </div>
         )}
       </form>
+      <div className="mt-3 text-sm">
+        <span>Don't have an account? </span>
+        <a className="text-blue-300 hover:text-blue-500" href="/sign-up">
+          Sign up
+        </a>
+      </div>
     </main>
   );
 }
