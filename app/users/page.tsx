@@ -19,7 +19,7 @@ async function deleteUser(url: string, { arg }: { arg: DeleteUserOptions }) {
   return await response.json();
 }
 
-export default function Dashboard() {
+export default function Users() {
   const router = useRouter();
   const backendUri = process.env.NEXT_PUBLIC_BACKEND_URI;
   const userToken =
