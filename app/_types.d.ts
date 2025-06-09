@@ -22,6 +22,7 @@ type PostUserArg = {
   adminCode: string;
 };
 type PostUserOption = { arg: PostUserArg };
+type PostChannelOption = { arg: { name: string; imageUrl: string } };
 type PostUserAuthOption = { arg: { email: string; password: string } };
 type User = {
   id: number;
@@ -41,6 +42,7 @@ export type {
   GetUsersOptions,
   loggedInUser,
   PostUserOption,
+  PostChannelOption,
   PostUserAuthOption,
   User,
 };
