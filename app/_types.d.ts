@@ -7,10 +7,16 @@ declare module "stream-chat" {
 }
 
 type ChangeEvent = React.ChangeEvent<HTMLInputElement>;
-type DeleteUserOptions = { userId: number; userToken: string | false | null };
+type Channel = {
+  id: number;
+  name: string;
+  imageUrl: string;
+  creatorId: string;
+};
+type DeleteFetcherOptions = { id: number; userToken: string | false | null };
 type Errors = { msg: string; path: string };
 type FormEvent = React.FormEvent<HTMLFormElement>;
-type GetUsersOptions = { url: string; userToken: string };
+type GetFetcherOptions = { url: string; userToken: string };
 type loggedInUser = { id: number; username: string; status: string };
 type PostUserArg = {
   firstName: string;
@@ -36,10 +42,11 @@ type User = {
 
 export type {
   ChangeEvent,
-  DeleteUserOptions,
+  Channel,
+  DeleteFetcherOptions,
   Errors,
   FormEvent,
-  GetUsersOptions,
+  GetFetcherOptions,
   loggedInUser,
   PostUserOption,
   PostChannelOption,

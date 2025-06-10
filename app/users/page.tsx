@@ -1,18 +1,18 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { DeleteUserOptions, GetUsersOptions, User } from "@/app/_types";
+import { DeleteFetcherOptions, GetFetcherOptions, User } from "@/app/_types";
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 
-async function getUsers({ url, userToken }: GetUsersOptions) {
+async function getUsers({ url, userToken }: GetFetcherOptions) {
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${userToken}` },
   });
   return await response.json();
 }
 
-async function deleteUser(url: string, { arg }: { arg: DeleteUserOptions }) {
-  const response = await fetch(`${url}/${arg.userId}`, {
+async function deleteUser(url: string, { arg }: { arg: DeleteFetcherOptions }) {
+  const response = await fetch(`${url}/${arg.id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${arg.userToken}` },
   });
@@ -21,25 +21,23 @@ async function deleteUser(url: string, { arg }: { arg: DeleteUserOptions }) {
 
 export default function Users() {
   const router = useRouter();
-  const backendUri = process.env.NEXT_PUBLIC_BACKEND_URI;
+  const url = `${process.env.NEXT_PUBLIC_BACKEND_URI}/users`;
   const userToken =
     typeof window !== "undefined" && localStorage.getItem("gistToken");
   const loggedInUserJson =
     typeof window !== "undefined" && localStorage.getItem("gistUserData");
   const loggedInUser = loggedInUserJson && JSON.parse(loggedInUserJson);
+
   const { data, error, isLoading } = useSWR(
-    { url: `${backendUri}/users/?status=${loggedInUser.status}`, userToken },
+    { url: `${url}/?status=${loggedInUser.status}`, userToken },
     getUsers
   );
-  const { trigger, isMutating } = useSWRMutation(
-    `${backendUri}/users`,
-    deleteUser
-  );
+  const { trigger, isMutating } = useSWRMutation(url, deleteUser);
 
-  async function removeUser(userId: number) {
+  async function removeUser(id: number) {
     try {
       if (confirm("Delete user permanently?")) {
-        await trigger({ userId, userToken });
+        await trigger({ id, userToken });
         router.refresh();
       }
     } catch (error) {
