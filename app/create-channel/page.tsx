@@ -5,21 +5,28 @@ import { Errors, FormEvent, PostChannelOption } from "@/app/_types";
 import useSWRMutation from "swr/mutation";
 
 async function postChannel(url: string, { arg }: PostChannelOption) {
+  const userToken = localStorage.getItem("gistToken");
   const response = await fetch(url, {
     method: "POST",
     body: JSON.stringify(arg),
-    headers: { "Content-type": "application/json; charset=UTF-8" },
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+      Authorization: `Bearer ${userToken}`,
+    },
   });
   return await response.json();
 }
 
 export default function CreateChannel() {
+  const loggedInUserJson =
+    typeof window !== "undefined" && localStorage.getItem("gistUserData");
+  const loggedInUser = loggedInUserJson && JSON.parse(loggedInUserJson);
   const router = useRouter();
   const [name, setName] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [errors, setErrors] = useState<Errors[]>([]);
   const { trigger, isMutating, data, error } = useSWRMutation(
-    `${process.env.NEXT_PUBLIC_BACKEND_URI}/channels`,
+    `${process.env.NEXT_PUBLIC_BACKEND_URI}/channels/?creator=${loggedInUser.username}`,
     postChannel
   );
 
