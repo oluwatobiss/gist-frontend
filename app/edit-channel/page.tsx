@@ -1,13 +1,19 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Errors, FormEvent, PostChannelOption } from "@/app/_types";
+import {
+  Errors,
+  FormEvent,
+  PostChannelOption,
+  loggedInUser,
+  Channel,
+} from "@/app/_types";
 import useSWRMutation from "swr/mutation";
 
-async function postChannel(url: string, { arg }: PostChannelOption) {
+async function putChannel(url: string, { arg }: PostChannelOption) {
   const userToken = localStorage.getItem("gistToken");
   const response = await fetch(url, {
-    method: "POST",
+    method: "PUT",
     body: JSON.stringify(arg),
     headers: {
       "Content-type": "application/json; charset=UTF-8",
@@ -17,32 +23,36 @@ async function postChannel(url: string, { arg }: PostChannelOption) {
   return await response.json();
 }
 
-export default function CreateChannel() {
+export default function EditChannel() {
   const loggedInUserJson =
     typeof window !== "undefined" && localStorage.getItem("gistUserData");
-  const loggedInUser = loggedInUserJson && JSON.parse(loggedInUserJson);
+  const channelDataJson =
+    typeof window !== "undefined" && localStorage.getItem("gistChannelToEdit");
+  const loggedInUser: loggedInUser =
+    loggedInUserJson && JSON.parse(loggedInUserJson);
+  const channelData: Channel = channelDataJson && JSON.parse(channelDataJson);
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [name, setName] = useState(channelData.name);
+  const [imageUrl, setImageUrl] = useState(channelData.imageUrl);
   const [errors, setErrors] = useState<Errors[]>([]);
   const { trigger, isMutating, data, error } = useSWRMutation(
-    `${process.env.NEXT_PUBLIC_BACKEND_URI}/channels/?creator=${loggedInUser.username}`,
-    postChannel
+    `${process.env.NEXT_PUBLIC_BACKEND_URI}/channels/${channelData.id}/?creator=${loggedInUser.username}`,
+    putChannel
   );
 
-  async function registerChannel(e: FormEvent) {
+  async function updateChannel(e: FormEvent) {
     e.preventDefault();
     try {
       const result = await trigger({ name, imageUrl });
-      console.log("=== registerChannel result ===");
+      console.log("=== updateChannel result ===");
       console.log(result);
-      console.log("=== registerChannel useSWRMutation data  ===");
+      console.log("=== updateChannel useSWRMutation data  ===");
       console.log(data);
       result.errors?.length
         ? setErrors(result.errors)
         : router.push("/channels");
     } catch (error) {
-      console.log("=== registerChannel error ===");
+      console.log("=== updateChannel error ===");
       console.log(error);
       if (error instanceof Error) console.error(error.message);
     }
@@ -62,7 +72,7 @@ export default function CreateChannel() {
     <main className="sm:px-[30%] sm:py-20 min-h-screen font-[family-name:var(--font-geist-sans)]">
       <form
         className="[&_.text-input]:w-full [&_input]:border [&_input]:border-gray-500 [&_input]:rounded-sm [&_input]:my-1 [&_input]:px-5 [&_input]:py-2 [&_input]:text-lg [&_label]:inline-block [&_label]:text-sm [&_.text-input-label]:mt-3"
-        onSubmit={registerChannel}
+        onSubmit={updateChannel}
       >
         <div>
           <label className="text-input-label" htmlFor="name">
@@ -99,11 +109,11 @@ export default function CreateChannel() {
           disabled={isMutating}
           className="cursor-pointer rounded-lg border border-solid border-transparent transition-colors bg-foreground text-background hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 mt-3 px-4 sm:px-5"
         >
-          Create channel
+          Update channel
         </button>
         {isMutating && (
           <div className="my-3 text-sm text-yellow-300">
-            Creating channel...
+            Update in progress...
           </div>
         )}
         {error && (

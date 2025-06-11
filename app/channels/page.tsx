@@ -86,9 +86,7 @@ export default function Channels() {
             type="button"
             className="cursor-pointer rounded-lg border border-solid border-transparent transition-colors bg-foreground text-background hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 mt-3 px-4 sm:px-5"
             onClick={() =>
-              editChannel(
-                data.filter((item: Channel) => channel.id !== item.id)
-              )
+              editChannel(data.find((item: Channel) => channel.id === item.id))
             }
           >
             Edit
