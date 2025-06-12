@@ -12,6 +12,7 @@ type Channel = {
   name: string;
   imageUrl: string;
   creatorId: string;
+  members: User[];
 };
 type DeleteFetcherOptions = { id: number; userToken: string | false | null };
 type Errors = { msg: string; path: string };

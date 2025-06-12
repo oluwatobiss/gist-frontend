@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Channel,
@@ -43,6 +44,7 @@ async function deleteChannel(
 
 export default function Channels() {
   const router = useRouter();
+  const members = useState<string[]>([]);
   const url = `${process.env.NEXT_PUBLIC_BACKEND_URI}/channels`;
   const userToken =
     typeof window !== "undefined" && localStorage.getItem("gistToken");
@@ -50,7 +52,10 @@ export default function Channels() {
     typeof window !== "undefined" && localStorage.getItem("gistUserData");
   const loggedInUser = loggedInUserJson && JSON.parse(loggedInUserJson);
 
-  const { data, error, isLoading } = useSWR({ url, userToken }, getChannels);
+  const { data, error, isLoading, mutate } = useSWR(
+    { url, userToken },
+    getChannels
+  );
   const { trigger, isMutating } = useSWRMutation(url, deleteChannel);
   const { trigger: subscribe, isMutating: isSubscribing } = useSWRMutation(
     url,
@@ -79,14 +84,16 @@ export default function Channels() {
 
   async function subscribeToChannel(channelId: number) {
     try {
-      const result = await subscribe({
+      const response = await subscribe({
         channelId,
         username: loggedInUser.username,
         userToken,
       });
       console.log("=== subscribeToChannel ===");
-      console.log(result);
-      router.refresh();
+      console.log(response);
+      mutate();
+      // Use state setter function to re-render component
+      members[1](response);
     } catch (error) {
       if (error instanceof Error) console.error(error.message);
     }
@@ -113,7 +120,7 @@ export default function Channels() {
             </div>
           )}
           <h3 className="text-2xl font-bold mb-3">{channel.name}</h3>
-          {loggedInUser.membership.includes(channel.id) ? (
+          {channel.members.includes(loggedInUser.username) ? (
             <button
               type="button"
               className="cursor-pointer rounded-lg border border-solid border-black/[.08] dark:border-white/[.145] transition-colors hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 mr-3 mb-3 px-4 sm:px-5 sm:w-auto"
