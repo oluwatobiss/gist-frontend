@@ -1,10 +1,10 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Errors, FormEvent, PostChannelOption } from "@/app/_types";
+import { Errors, FormEvent, UpsertFetcherOption } from "@/app/_types";
 import useSWRMutation from "swr/mutation";
 
-async function postChannel(url: string, { arg }: PostChannelOption) {
+async function postChannel(url: string, { arg }: UpsertFetcherOption) {
   const userToken = localStorage.getItem("gistToken");
   const response = await fetch(url, {
     method: "POST",

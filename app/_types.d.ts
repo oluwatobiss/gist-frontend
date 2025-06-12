@@ -28,7 +28,14 @@ type PostUserArg = {
   adminCode: string;
 };
 type PostUserOption = { arg: PostUserArg };
-type PostChannelOption = { arg: { name: string; imageUrl: string } };
+type UpsertFetcherOption = { arg: { name: string; imageUrl: string } };
+type PostSubscribeOption = {
+  arg: {
+    channelId: number;
+    username: string;
+    userToken: string | false | null;
+  };
+};
 type PostUserAuthOption = { arg: { email: string; password: string } };
 type User = {
   id: number;
@@ -49,7 +56,8 @@ export type {
   GetFetcherOptions,
   loggedInUser,
   PostUserOption,
-  PostChannelOption,
+  UpsertFetcherOption,
   PostUserAuthOption,
+  PostSubscribeOption,
   User,
 };

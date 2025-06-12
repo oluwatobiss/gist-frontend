@@ -4,13 +4,13 @@ import { useRouter } from "next/navigation";
 import {
   Errors,
   FormEvent,
-  PostChannelOption,
+  UpsertFetcherOption,
   loggedInUser,
   Channel,
 } from "@/app/_types";
 import useSWRMutation from "swr/mutation";
 
-async function putChannel(url: string, { arg }: PostChannelOption) {
+async function putChannel(url: string, { arg }: UpsertFetcherOption) {
   const userToken = localStorage.getItem("gistToken");
   const response = await fetch(url, {
     method: "PUT",
