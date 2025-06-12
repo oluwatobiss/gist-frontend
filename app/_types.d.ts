@@ -30,7 +30,7 @@ type PostUserArg = {
 };
 type PostUserOption = { arg: PostUserArg };
 type UpsertFetcherOption = { arg: { name: string; imageUrl: string } };
-type PostSubscribeOption = {
+type SubscriptionOption = {
   arg: {
     channelId: number;
     username: string;
@@ -59,6 +59,6 @@ export type {
   PostUserOption,
   UpsertFetcherOption,
   PostUserAuthOption,
-  PostSubscribeOption,
+  SubscriptionOption,
   User,
 };

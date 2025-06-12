@@ -5,7 +5,7 @@ import {
   Channel,
   DeleteFetcherOptions,
   GetFetcherOptions,
-  PostSubscribeOption,
+  SubscriptionOption,
 } from "@/app/_types";
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
@@ -17,14 +17,22 @@ async function getChannels({ url, userToken }: GetFetcherOptions) {
   return await response.json();
 }
 
-async function postSubscribeToChannel(
-  url: string,
-  { arg }: PostSubscribeOption
-) {
+async function postUserToChannel(url: string, { arg }: SubscriptionOption) {
   const response = await fetch(
     `${url}/${arg.channelId}/users/${arg.username}`,
     {
       method: "POST",
+      headers: { Authorization: `Bearer ${arg.userToken}` },
+    }
+  );
+  return await response.json();
+}
+
+async function deleteUserFromChannel(url: string, { arg }: SubscriptionOption) {
+  const response = await fetch(
+    `${url}/${arg.channelId}/users/${arg.username}`,
+    {
+      method: "DELETE",
       headers: { Authorization: `Bearer ${arg.userToken}` },
     }
   );
@@ -57,10 +65,8 @@ export default function Channels() {
     getChannels
   );
   const { trigger, isMutating } = useSWRMutation(url, deleteChannel);
-  const { trigger: subscribe, isMutating: isSubscribing } = useSWRMutation(
-    url,
-    postSubscribeToChannel
-  );
+  const { trigger: subscribe } = useSWRMutation(url, postUserToChannel);
+  const { trigger: unsubscribe } = useSWRMutation(url, deleteUserFromChannel);
 
   console.log("=== Channel Data from GET request ===");
   console.log(data);
@@ -80,8 +86,6 @@ export default function Channels() {
     }
   }
 
-  async function unSubscribeFromChannel(id: number) {}
-
   async function subscribeToChannel(channelId: number) {
     try {
       const response = await subscribe({
@@ -94,6 +98,27 @@ export default function Channels() {
       mutate();
       // Use state setter function to re-render component
       members[1](response);
+    } catch (error) {
+      if (error instanceof Error) console.error(error.message);
+    }
+  }
+
+  async function unsubscribeFromChannel(
+    channelId: number,
+    channelName: string
+  ) {
+    try {
+      if (confirm(`Unsubscribe from the ${channelName} channel?`)) {
+        const response = await unsubscribe({
+          channelId,
+          username: loggedInUser.username,
+          userToken,
+        });
+        console.log("=== unsubscribeFromChannel ===");
+        console.log(response);
+        mutate();
+        members[1](response);
+      }
     } catch (error) {
       if (error instanceof Error) console.error(error.message);
     }
@@ -124,7 +149,7 @@ export default function Channels() {
             <button
               type="button"
               className="cursor-pointer rounded-lg border border-solid border-black/[.08] dark:border-white/[.145] transition-colors hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 mr-3 mb-3 px-4 sm:px-5 sm:w-auto"
-              onClick={() => unSubscribeFromChannel(channel.id)}
+              onClick={() => unsubscribeFromChannel(channel.id, channel.name)}
             >
               Unsubscribe
             </button>
