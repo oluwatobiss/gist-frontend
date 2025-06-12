@@ -31,7 +31,7 @@ export default function ChatRoom() {
   const sort: ChannelSort = { last_message_at: -1 };
   const filters: ChannelFilters = {
     type: "messaging",
-    // members: { $in: [loggedInUser.username] },
+    members: { $in: [loggedInUser.username] },
   };
   const options: ChannelOptions = {
     limit: 10,
