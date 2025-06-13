@@ -5,7 +5,7 @@ import {
   Errors,
   FormEvent,
   UpsertFetcherOption,
-  loggedInUser,
+  LoggedInUser,
   Channel,
 } from "@/app/_types";
 import useSWRMutation from "swr/mutation";
@@ -28,7 +28,7 @@ export default function EditChannel() {
     typeof window !== "undefined" && localStorage.getItem("gistUserData");
   const channelDataJson =
     typeof window !== "undefined" && localStorage.getItem("gistChannelToEdit");
-  const loggedInUser: loggedInUser =
+  const loggedInUser: LoggedInUser =
     loggedInUserJson && JSON.parse(loggedInUserJson);
   const channelData: Channel = channelDataJson && JSON.parse(channelDataJson);
   const router = useRouter();

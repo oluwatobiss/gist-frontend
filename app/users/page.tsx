@@ -80,13 +80,17 @@ export default function Users() {
   return (
     <main className="sm:px-[30%] sm:py-20 min-h-screen font-[family-name:var(--font-geist-sans)]">
       {isLoading ? (
-        <div className="my-3 text-sm text-yellow-300">Loading...</div>
+        <div className="w-full pt-30 text-center text-sm text-yellow-300">
+          Loading...
+        </div>
       ) : error ? (
-        <div className="my-3 text-sm text-red-500">Error: {error.message}</div>
+        <div className="w-full pt-30 text-center text-sm text-red-500">
+          Error: {error.message}
+        </div>
       ) : data.length ? (
         createUserCards(data)
       ) : (
-        <div className="w-full text-center text-sm text-gray-600 pt-30">
+        <div className="w-full pt-30 text-center text-sm text-gray-600">
           Admin pass required to manage users
         </div>
       )}

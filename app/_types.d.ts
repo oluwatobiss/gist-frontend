@@ -18,7 +18,7 @@ type DeleteFetcherOptions = { id: number; userToken: string | false | null };
 type Errors = { msg: string; path: string };
 type FormEvent = React.FormEvent<HTMLFormElement>;
 type GetFetcherOptions = { url: string; userToken: string };
-type loggedInUser = { id: number; username: string; status: string };
+type LoggedInUser = { id: number; username: string; status: string };
 type PostUserArg = {
   firstName: string;
   lastName: string;
@@ -29,6 +29,7 @@ type PostUserArg = {
   adminCode: string;
 };
 type PostUserOption = { arg: PostUserArg };
+type PutUserOption = { arg: Omit<PostUserArg, "password"> };
 type UpsertFetcherOption = { arg: { name: string; imageUrl: string } };
 type SubscriptionOption = {
   arg: {
@@ -55,8 +56,9 @@ export type {
   Errors,
   FormEvent,
   GetFetcherOptions,
-  loggedInUser,
+  LoggedInUser,
   PostUserOption,
+  PutUserOption,
   UpsertFetcherOption,
   PostUserAuthOption,
   SubscriptionOption,
