@@ -1,23 +1,8 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  ChangeEvent,
-  Errors,
-  FormEvent,
-  // LoggedInUser,
-  PutUserOption,
-  // GetFetcherOptions,
-} from "@/app/_types";
-// import useSWR from "swr";
+import { ChangeEvent, Errors, FormEvent, PutUserOption } from "@/app/_types";
 import useSWRMutation from "swr/mutation";
-
-// async function getUser({ url, userToken }: GetFetcherOptions) {
-//   const response = await fetch(url, {
-//     headers: { Authorization: `Bearer ${userToken}` },
-//   });
-//   return await response.json();
-// }
 
 async function putUser(url: string, { arg }: PutUserOption) {
   const response = await fetch(url, {
@@ -29,19 +14,6 @@ async function putUser(url: string, { arg }: PutUserOption) {
 }
 
 export default function Profile() {
-  // const url = `${process.env.NEXT_PUBLIC_BACKEND_URI}/users`;
-  // const userToken =
-  //   typeof window !== "undefined" && localStorage.getItem("gistToken");
-  // const loggedInUserJson =
-  //   typeof window !== "undefined" && localStorage.getItem("gistUserData");
-  // const loggedInUser: LoggedInUser =
-  //   loggedInUserJson && JSON.parse(loggedInUserJson);
-  // const {
-  //   data: user,
-  //   error: getUserError,
-  //   isLoading,
-  // } = useSWR({ url: `${url}/${loggedInUser.id}`, userToken }, getUser);
-
   const userDataJson = localStorage.getItem("gistUserToEdit");
   const userData = userDataJson && JSON.parse(userDataJson);
 
@@ -51,13 +23,12 @@ export default function Profile() {
   const router = useRouter();
   const [firstName, setFirstName] = useState(userData.firstName);
   const [lastName, setLastName] = useState(userData.lastName);
-  const [username, setUsername] = useState(userData.username);
   const [email, setEmail] = useState(userData.email);
   const [admin, setAdmin] = useState(userData.status === "ADMIN");
   const [adminCode, setAdminCode] = useState("");
   const [errors, setErrors] = useState<Errors[]>([]);
   const { trigger, isMutating, data, error } = useSWRMutation(
-    `${process.env.NEXT_PUBLIC_BACKEND_URI}/users`,
+    `${process.env.NEXT_PUBLIC_BACKEND_URI}/users/${userData.id}`,
     putUser
   );
 
@@ -67,7 +38,6 @@ export default function Profile() {
       const result = await trigger({
         firstName,
         lastName,
-        username,
         email,
         admin,
         adminCode,
@@ -76,7 +46,7 @@ export default function Profile() {
       console.log(result);
       console.log("=== updateUser useSWRMutation data  ===");
       console.log(data);
-      result.errors?.length ? setErrors(result.errors) : router.push("/login");
+      result.errors?.length ? setErrors(result.errors) : router.push("/");
     } catch (error) {
       console.log("=== updateUser error ===");
       console.log(error);
@@ -101,15 +71,6 @@ export default function Profile() {
 
   return (
     <main className="sm:px-[30%] sm:py-20 min-h-screen font-[family-name:var(--font-geist-sans)]">
-      {/* {isLoading ? (
-        <div className="w-full pt-30 text-center text-sm text-yellow-300">
-          Loading...
-        </div>
-      ) : getUserError ? (
-        <div className="w-full pt-30 text-center text-sm text-red-500">
-          Error: {getUserError.message}
-        </div>
-      ) : ( */}
       <form
         className="[&_.text-input]:w-full [&_input]:border [&_input]:border-gray-500 [&_input]:rounded-sm [&_input]:my-1 [&_input]:px-5 [&_input]:py-2 [&_input]:text-lg [&_label]:inline-block [&_label]:text-sm [&_.text-input-label]:mt-3"
         onSubmit={updateUser}
@@ -143,21 +104,6 @@ export default function Profile() {
             required
           />
           {showErrorFor("lastName")}
-        </div>
-        <div>
-          <label className="text-input-label" htmlFor="username">
-            Username
-          </label>
-          <input
-            className="text-input"
-            type="text"
-            name="username"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-          {showErrorFor("username")}
         </div>
         <div>
           <label className="text-input-label" htmlFor="email">
@@ -221,7 +167,6 @@ export default function Profile() {
           </div>
         )}
       </form>
-      {/* )} */}
     </main>
   );
 }
