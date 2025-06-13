@@ -31,10 +31,12 @@ export default function Login() {
       console.log("=== authenticateUser ===");
       console.log(result);
 
+      if (result.errors?.length) return setErrors(result.errors);
+
       localStorage.setItem("gistToken", result.token);
       localStorage.setItem("streamToken", result.streamToken);
       localStorage.setItem("gistUserData", JSON.stringify(result.payload));
-      result.errors?.length ? setErrors(result.errors) : router.push("/");
+      router.push("/");
     } catch (error) {
       if (error instanceof Error) console.error(error.message);
     }

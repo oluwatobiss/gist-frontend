@@ -46,7 +46,10 @@ export default function Profile() {
       console.log(result);
       console.log("=== updateUser useSWRMutation data  ===");
       console.log(data);
-      result.errors?.length ? setErrors(result.errors) : router.push("/");
+
+      if (result.errors?.length) return setErrors(result.errors);
+      localStorage.setItem("gistUserData", JSON.stringify(result));
+      router.push("/");
     } catch (error) {
       console.log("=== updateUser error ===");
       console.log(error);
