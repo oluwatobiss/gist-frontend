@@ -14,7 +14,7 @@ async function putUser(url: string, { arg }: PutUserOption) {
 }
 
 export default function Profile() {
-  const userDataJson = localStorage.getItem("gistUserToEdit");
+  const userDataJson = localStorage.getItem("gistUserData");
   const userData = userDataJson && JSON.parse(userDataJson);
 
   console.log("=== userData ===");
