@@ -83,7 +83,12 @@ export default function ChatRoom() {
     };
   }, [cachedUserData]);
 
-  if (!chatClient) return <div>Setting up client & connection...</div>;
+  if (!chatClient)
+    return (
+      <div className="w-full pt-30 text-center text-sm">
+        Setting up client & connection...
+      </div>
+    );
 
   return (
     <Chat client={chatClient}>
