@@ -91,16 +91,18 @@ export default function ChatRoom() {
     );
 
   return (
-    <Chat client={chatClient}>
-      <ChannelList filters={filters} sort={sort} options={options} />
-      <Channel>
-        <Window>
-          <ChannelHeader />
-          <MessageList />
-          <MessageInput />
-        </Window>
-        <Thread />
-      </Channel>
-    </Chat>
+    <main>
+      <Chat client={chatClient}>
+        <ChannelList filters={filters} sort={sort} options={options} />
+        <Channel>
+          <Window>
+            <ChannelHeader />
+            <MessageList />
+            <MessageInput />
+          </Window>
+          <Thread />
+        </Channel>
+      </Chat>
+    </main>
   );
 }

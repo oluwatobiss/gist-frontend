@@ -6,8 +6,18 @@ body {
 }
 
 body {
-  display: flex;
   height: 100%;
+}
+
+main {
+  display: flex;
+  width: inherit;
+  height: inherit;
+}
+
+nav {
+  background-color: #fff;
+  border-bottom: 1px solid lightgray;
 }
 
 body .str-chat__channel-list {
