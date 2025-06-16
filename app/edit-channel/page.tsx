@@ -36,7 +36,7 @@ export default function EditChannel() {
   const [imageUrl, setImageUrl] = useState(channelData.imageUrl);
   const [errors, setErrors] = useState<Errors[]>([]);
   const { trigger, isMutating, data, error } = useSWRMutation(
-    `${process.env.NEXT_PUBLIC_BACKEND_URI}/channels/${channelData.id}/?creator=${loggedInUser.username}`,
+    `${process.env.NEXT_PUBLIC_BACKEND_URI}/channels/${channelData.streamId}/?creator=${loggedInUser.username}`,
     putChannel
   );
 

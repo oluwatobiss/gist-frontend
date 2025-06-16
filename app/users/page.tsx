@@ -34,11 +34,11 @@ export default function Users() {
   );
   const { trigger, isMutating } = useSWRMutation(url, deleteUser);
 
-  async function removeUser(id: number) {
+  async function removeUser(id: string) {
     try {
       if (confirm("Delete user permanently?")) {
         await trigger({ id, userToken });
-        router.refresh();
+        window.location.reload();
       }
     } catch (error) {
       if (error instanceof Error) console.error(error.message);
@@ -52,7 +52,7 @@ export default function Users() {
       return (
         <div
           key={user.id}
-          className="border border-gray-400 rounded-sm p-5 mb-4 [&_button]:mr-3 [&_button]:px-6 [&_button]:py-1.5 [&_button]:border [&_button]:rounded-sm [&_button]:border-gray-400 [&_button]:bg-gray-100 [&_button]:hover:bg-gray-200 [&_button]:text-sm [&_button]:text-gray-800 [&_button]:cursor-pointer"
+          className="border border-gray-400 rounded-sm p-5 mb-4"
         >
           <div className="text-xs text-gray-500">
             <span>@{user.username}</span> <span>{user.status}</span>
@@ -66,10 +66,10 @@ export default function Users() {
             <button
               disabled={isMutating}
               type="button"
-              className="cursor-pointer rounded-lg border border-solid border-transparent transition-colors bg-foreground text-background hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 mt-3 px-4 sm:px-5"
-              onClick={() => removeUser(user.id)}
+              className="cursor-pointer rounded-lg border border-solid border-transparent transition-colors bg-foreground text-background hover:bg-red-500 dark:hover:bg-red-500 font-medium text-sm sm:text-base h-10 sm:h-12 mt-3 px-4 sm:px-5"
+              onClick={() => removeUser(user.username)}
             >
-              {isMutating ? "Deleting user..." : "Delete"}
+              Delete
             </button>
           )}
         </div>

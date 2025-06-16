@@ -13,9 +13,22 @@ async function putUser(url: string, { arg }: PutUserOption) {
   return await response.json();
 }
 
+async function deleteUser(
+  url: string,
+  { arg }: { arg: { userToken: string | null } }
+) {
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${arg.userToken}` },
+  });
+  return await response.json();
+}
+
 export default function Profile() {
+  const userToken = localStorage.getItem("gistToken");
   const userDataJson = localStorage.getItem("gistUserData");
   const userData = userDataJson && JSON.parse(userDataJson);
+  const url = `${process.env.NEXT_PUBLIC_BACKEND_URI}/users/${userData.username}`;
 
   console.log("=== userData ===");
   console.log(userData);
@@ -27,9 +40,10 @@ export default function Profile() {
   const [admin, setAdmin] = useState(userData.status === "ADMIN");
   const [adminCode, setAdminCode] = useState("");
   const [errors, setErrors] = useState<Errors[]>([]);
-  const { trigger, isMutating, data, error } = useSWRMutation(
-    `${process.env.NEXT_PUBLIC_BACKEND_URI}/users/${userData.id}`,
-    putUser
+  const { trigger, isMutating, data, error } = useSWRMutation(url, putUser);
+  const { trigger: removeUser, isMutating: isDeleting } = useSWRMutation(
+    url,
+    deleteUser
   );
 
   async function updateUser(e: FormEvent) {
@@ -70,6 +84,23 @@ export default function Profile() {
     ) : (
       ""
     );
+  }
+
+  async function deleteAccount() {
+    try {
+      if (confirm("Delete your account permanently?")) {
+        const response = await removeUser({ userToken });
+        console.log("=== deleteAccount ===");
+        console.log(response);
+
+        localStorage.removeItem("gistToken");
+        localStorage.removeItem("streamToken");
+        localStorage.removeItem("gistUserData");
+        router.push("/");
+      }
+    } catch (error) {
+      if (error instanceof Error) console.error(error.message);
+    }
   }
 
   return (
@@ -159,17 +190,23 @@ export default function Profile() {
         >
           Update
         </button>
-        {isMutating && (
-          <div className="my-3 text-sm text-yellow-300">
-            Updating profile...
-          </div>
-        )}
-        {error && (
-          <div className="my-3 text-sm text-red-500">
-            Error: {error.message}
-          </div>
-        )}
       </form>
+      <hr className="my-5 text-gray-600" />
+      <p className="text-sm text-red-500">Danger Zone</p>
+      <button
+        type="button"
+        disabled={isDeleting}
+        onClick={() => deleteAccount()}
+        className="cursor-pointer rounded-lg border border-solid border-transparent transition-colors bg-foreground text-background hover:bg-red-500 dark:hover:bg-red-500 font-medium text-sm sm:text-base h-10 sm:h-12 mt-3 px-4 sm:px-5"
+      >
+        Delete Account
+      </button>
+      {isMutating && (
+        <div className="my-3 text-sm text-yellow-300">Updating profile...</div>
+      )}
+      {error && (
+        <div className="my-3 text-sm text-red-500">Error: {error.message}</div>
+      )}
     </main>
   );
 }

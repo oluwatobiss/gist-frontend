@@ -12,9 +12,10 @@ type Channel = {
   name: string;
   imageUrl: string;
   creatorId: string;
+  streamId: string;
   members: User[];
 };
-type DeleteFetcherOptions = { id: number; userToken: string | false | null };
+type DeleteFetcherOptions = { id: string; userToken: string | false | null };
 type Errors = { msg: string; path: string };
 type FormEvent = React.FormEvent<HTMLFormElement>;
 type GetFetcherOptions = { url: string; userToken: string };
@@ -33,7 +34,7 @@ type PutUserOption = { arg: Omit<PostUserArg, "username" | "password"> };
 type UpsertFetcherOption = { arg: { name: string; imageUrl: string } };
 type SubscriptionOption = {
   arg: {
-    channelId: number;
+    channelId: string;
     username: string;
     userToken: string | false | null;
   };

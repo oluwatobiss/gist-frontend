@@ -20,6 +20,10 @@ nav {
   border-bottom: 1px solid lightgray;
 }
 
+nav a {
+  color: #000;
+}
+
 body .str-chat__channel-list {
   position: fixed;
   z-index: 1;

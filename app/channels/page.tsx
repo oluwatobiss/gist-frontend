@@ -71,7 +71,7 @@ export default function Channels() {
   console.log("=== Channel Data from GET request ===");
   console.log(data);
 
-  async function removeChannel(id: number) {
+  async function removeChannel(id: string) {
     try {
       if (confirm("Delete channel permanently?")) {
         const result = await trigger({ id, userToken });
@@ -79,14 +79,14 @@ export default function Channels() {
         console.log("=== Deleted channel's data ===");
         console.log(result);
 
-        router.refresh();
+        window.location.reload();
       }
     } catch (error) {
       if (error instanceof Error) console.error(error.message);
     }
   }
 
-  async function subscribeToChannel(channelId: number) {
+  async function subscribeToChannel(channelId: string) {
     try {
       const response = await subscribe({
         channelId,
@@ -104,7 +104,7 @@ export default function Channels() {
   }
 
   async function unsubscribeFromChannel(
-    channelId: number,
+    channelId: string,
     channelName: string
   ) {
     try {
@@ -149,7 +149,9 @@ export default function Channels() {
             <button
               type="button"
               className="cursor-pointer rounded-lg border border-solid border-black/[.08] dark:border-white/[.145] transition-colors hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 mr-3 mb-3 px-4 sm:px-5 sm:w-auto"
-              onClick={() => unsubscribeFromChannel(channel.id, channel.name)}
+              onClick={() =>
+                unsubscribeFromChannel(channel.streamId, channel.name)
+              }
             >
               Unsubscribe
             </button>
@@ -157,7 +159,7 @@ export default function Channels() {
             <button
               type="button"
               className="cursor-pointer rounded-lg border border-solid border-transparent transition-colors bg-foreground text-background hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 mr-3 mt-3 px-4 sm:px-5"
-              onClick={() => subscribeToChannel(channel.id)}
+              onClick={() => subscribeToChannel(channel.streamId)}
             >
               Subscribe
             </button>
@@ -168,7 +170,7 @@ export default function Channels() {
                 disabled={isMutating}
                 type="button"
                 className="cursor-pointer rounded-lg border border-solid border-black/[.08] dark:border-white/[.145] transition-colors hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 mr-3 mb-3 px-4 sm:px-5 sm:w-auto"
-                onClick={() => removeChannel(channel.id)}
+                onClick={() => removeChannel(channel.streamId)}
               >
                 {isMutating ? "Deleting channel..." : "Delete"}
               </button>

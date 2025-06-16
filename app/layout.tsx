@@ -30,7 +30,7 @@ export default function RootLayout({
         <nav className="text-center">
           <a
             href="/"
-            className="inline-block px-4 py-5 text-xl font-bold uppercase text-blue-700 hover:bg-orange-300 focus:bg-orange-300"
+            className="inline-block px-4 py-5 text-xl font-bold uppercase text-white hover:text-black hover:bg-orange-300 focus:bg-orange-300"
           >
             Gist
           </a>
