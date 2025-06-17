@@ -13,6 +13,7 @@ import useSWRMutation from "swr/mutation";
 async function getChannels({ url, userToken }: GetFetcherOptions) {
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${userToken}` },
+    // headers: { Authorization: `Bearer Test` },
   });
   return await response.json();
 }
@@ -23,6 +24,7 @@ async function postUserToChannel(url: string, { arg }: SubscriptionOption) {
     {
       method: "POST",
       headers: { Authorization: `Bearer ${arg.userToken}` },
+      // headers: { Authorization: `Bearer Test` },
     }
   );
   return await response.json();
@@ -34,6 +36,7 @@ async function deleteUserFromChannel(url: string, { arg }: SubscriptionOption) {
     {
       method: "DELETE",
       headers: { Authorization: `Bearer ${arg.userToken}` },
+      // headers: { Authorization: `Bearer Test` },
     }
   );
   return await response.json();
@@ -46,6 +49,7 @@ async function deleteChannel(
   const response = await fetch(`${url}/${arg.id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${arg.userToken}` },
+    // headers: { Authorization: `Bearer Test` },
   });
   return await response.json();
 }
@@ -79,6 +83,11 @@ export default function Channels() {
         console.log("=== Deleted channel's data ===");
         console.log(result);
 
+        if (result.message) {
+          alert("Error: Invalid delete credentials");
+          throw new Error(result.message);
+        }
+
         window.location.reload();
       }
     } catch (error) {
@@ -88,16 +97,22 @@ export default function Channels() {
 
   async function subscribeToChannel(channelId: string) {
     try {
-      const response = await subscribe({
+      const result = await subscribe({
         channelId,
         username: loggedInUser.username,
         userToken,
       });
       console.log("=== subscribeToChannel ===");
-      console.log(response);
+      console.log(result);
+
+      if (result.message) {
+        alert("Error: Invalid subscription credentials");
+        throw new Error(result.message);
+      }
+
       mutate();
       // Use state setter function to re-render component
-      members[1](response);
+      members[1](result);
     } catch (error) {
       if (error instanceof Error) console.error(error.message);
     }
@@ -109,15 +124,21 @@ export default function Channels() {
   ) {
     try {
       if (confirm(`Unsubscribe from the ${channelName} channel?`)) {
-        const response = await unsubscribe({
+        const result = await unsubscribe({
           channelId,
           username: loggedInUser.username,
           userToken,
         });
         console.log("=== unsubscribeFromChannel ===");
-        console.log(response);
+        console.log(result);
+
+        if (result.message) {
+          alert("Error: Invalid unsubscription credentials");
+          throw new Error(result.message);
+        }
+
         mutate();
-        members[1](response);
+        members[1](result);
       }
     } catch (error) {
       if (error instanceof Error) console.error(error.message);
@@ -132,7 +153,7 @@ export default function Channels() {
     router.push("/edit-channel");
   }
 
-  function createChannelCards(channels: Channel[]) {
+  function channelCards(channels: Channel[]) {
     return channels.map((channel) => {
       return (
         <div
@@ -172,7 +193,7 @@ export default function Channels() {
                 className="cursor-pointer rounded-lg border border-solid border-black/[.08] dark:border-white/[.145] transition-colors hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 mr-3 mb-3 px-4 sm:px-5 sm:w-auto"
                 onClick={() => removeChannel(channel.streamId)}
               >
-                {isMutating ? "Deleting channel..." : "Delete"}
+                Delete
               </button>
               <button
                 type="button"
@@ -198,10 +219,12 @@ export default function Channels() {
         <div className="w-full pt-30 text-center text-sm text-yellow-300">
           Loading...
         </div>
-      ) : error ? (
-        <div className="my-3 text-sm text-red-500">Error: {error.message}</div>
+      ) : error || !Array.isArray(data) ? (
+        <div className="w-full pt-30 text-center text-sm text-red-500">
+          Error: {error?.message || data.message}
+        </div>
       ) : data.length ? (
-        createChannelCards(data)
+        channelCards(data)
       ) : (
         <div className="w-full pt-30 text-center text-sm text-gray-600">
           No channels available

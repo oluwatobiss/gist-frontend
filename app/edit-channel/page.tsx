@@ -18,6 +18,7 @@ async function putChannel(url: string, { arg }: UpsertFetcherOption) {
     headers: {
       "Content-type": "application/json; charset=UTF-8",
       Authorization: `Bearer ${userToken}`,
+      // Authorization: `Bearer Test`,
     },
   });
   return await response.json();
@@ -48,9 +49,13 @@ export default function EditChannel() {
       console.log(result);
       console.log("=== updateChannel useSWRMutation data  ===");
       console.log(data);
-      result.errors?.length
-        ? setErrors(result.errors)
-        : router.push("/channels");
+
+      if (result.errors?.length) return setErrors(result.errors);
+      if (result.message) {
+        alert("Error: Invalid edit credentials");
+        throw new Error(result.message);
+      }
+      router.push("/channels");
     } catch (error) {
       console.log("=== updateChannel error ===");
       console.log(error);

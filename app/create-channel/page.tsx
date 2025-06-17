@@ -12,6 +12,7 @@ async function postChannel(url: string, { arg }: UpsertFetcherOption) {
     headers: {
       "Content-type": "application/json; charset=UTF-8",
       Authorization: `Bearer ${userToken}`,
+      // Authorization: `Bearer Test`,
     },
   });
   return await response.json();
@@ -38,9 +39,14 @@ export default function CreateChannel() {
       console.log(result);
       console.log("=== registerChannel useSWRMutation data  ===");
       console.log(data);
-      result.errors?.length
-        ? setErrors(result.errors)
-        : router.push("/channels");
+
+      if (result.errors?.length) return setErrors(result.errors);
+      if (result.message) {
+        alert("Error: Invalid edit credentials");
+        throw new Error(result.message);
+      }
+
+      router.push("/channels");
     } catch (error) {
       console.log("=== registerChannel error ===");
       console.log(error);
@@ -60,58 +66,64 @@ export default function CreateChannel() {
 
   return (
     <main className="sm:px-[30%] sm:py-20 min-h-screen font-[family-name:var(--font-geist-sans)]">
-      <form
-        className="[&_.text-input]:w-full [&_input]:border [&_input]:border-gray-500 [&_input]:rounded-sm [&_input]:my-1 [&_input]:px-5 [&_input]:py-2 [&_input]:text-lg [&_label]:inline-block [&_label]:text-sm [&_.text-input-label]:mt-3"
-        onSubmit={registerChannel}
-      >
-        <div>
-          <label className="text-input-label" htmlFor="name">
-            Name
-          </label>
-          <input
-            className="text-input"
-            type="text"
-            name="name"
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          {showErrorFor("name")}
-        </div>
-        <div>
-          <label className="text-input-label" htmlFor="imageUrl">
-            URL
-          </label>
-          <input
-            className="text-input"
-            type="url"
-            name="imageUrl"
-            id="imageUrl"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            required
-          />
-          {showErrorFor("imageUrl")}
-        </div>
-        <button
-          type="submit"
-          disabled={isMutating}
-          className="cursor-pointer rounded-lg border border-solid border-transparent transition-colors bg-foreground text-background hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 mt-3 px-4 sm:px-5"
+      {loggedInUser.status === "ADMIN" ? (
+        <form
+          className="[&_.text-input]:w-full [&_input]:border [&_input]:border-gray-500 [&_input]:rounded-sm [&_input]:my-1 [&_input]:px-5 [&_input]:py-2 [&_input]:text-lg [&_label]:inline-block [&_label]:text-sm [&_.text-input-label]:mt-3"
+          onSubmit={registerChannel}
         >
-          Create channel
-        </button>
-        {isMutating && (
-          <div className="my-3 text-sm text-yellow-300">
-            Creating channel...
+          <div>
+            <label className="text-input-label" htmlFor="name">
+              Name
+            </label>
+            <input
+              className="text-input"
+              type="text"
+              name="name"
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+            {showErrorFor("name")}
           </div>
-        )}
-        {error && (
-          <div className="my-3 text-sm text-red-500">
-            Error: {error.message}
+          <div>
+            <label className="text-input-label" htmlFor="imageUrl">
+              URL
+            </label>
+            <input
+              className="text-input"
+              type="url"
+              name="imageUrl"
+              id="imageUrl"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              required
+            />
+            {showErrorFor("imageUrl")}
           </div>
-        )}
-      </form>
+          <button
+            type="submit"
+            disabled={isMutating}
+            className="cursor-pointer rounded-lg border border-solid border-transparent transition-colors bg-foreground text-background hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 mt-3 px-4 sm:px-5"
+          >
+            Create channel
+          </button>
+          {isMutating && (
+            <div className="my-3 text-sm text-yellow-300">
+              Creating channel...
+            </div>
+          )}
+          {error && (
+            <div className="my-3 text-sm text-red-500">
+              Error: {error.message}
+            </div>
+          )}
+        </form>
+      ) : (
+        <div className="w-full pt-30 text-center text-sm text-gray-600">
+          Admin pass required to create channels
+        </div>
+      )}
     </main>
   );
 }

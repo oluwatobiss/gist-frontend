@@ -30,7 +30,11 @@ type PostUserArg = {
   adminCode: string;
 };
 type PostUserOption = { arg: PostUserArg };
-type PutUserOption = { arg: Omit<PostUserArg, "username" | "password"> };
+type PutUserOption = {
+  arg: Omit<PostUserArg, "username" | "password"> & {
+    userToken: string | null;
+  };
+};
 type UpsertFetcherOption = { arg: { name: string; imageUrl: string } };
 type SubscriptionOption = {
   arg: {

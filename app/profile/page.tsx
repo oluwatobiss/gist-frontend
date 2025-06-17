@@ -1,25 +1,33 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, Errors, FormEvent, PutUserOption } from "@/app/_types";
+import {
+  ChangeEvent,
+  DeleteFetcherOptions,
+  Errors,
+  FormEvent,
+  PutUserOption,
+} from "@/app/_types";
 import useSWRMutation from "swr/mutation";
 
 async function putUser(url: string, { arg }: PutUserOption) {
   const response = await fetch(url, {
     method: "PUT",
     body: JSON.stringify(arg),
-    headers: { "Content-type": "application/json; charset=UTF-8" },
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+      Authorization: `Bearer ${arg.userToken}`,
+      // Authorization: `Bearer Test`,
+    },
   });
   return await response.json();
 }
 
-async function deleteUser(
-  url: string,
-  { arg }: { arg: { userToken: string | null } }
-) {
-  const response = await fetch(url, {
+async function deleteUser(url: string, { arg }: { arg: DeleteFetcherOptions }) {
+  const response = await fetch(`${url}/${arg.id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${arg.userToken}` },
+    // headers: { Authorization: `Bearer Test` },
   });
   return await response.json();
 }
@@ -28,7 +36,7 @@ export default function Profile() {
   const userToken = localStorage.getItem("gistToken");
   const userDataJson = localStorage.getItem("gistUserData");
   const userData = userDataJson && JSON.parse(userDataJson);
-  const url = `${process.env.NEXT_PUBLIC_BACKEND_URI}/users/${userData.username}`;
+  const url = `${process.env.NEXT_PUBLIC_BACKEND_URI}/users`;
 
   console.log("=== userData ===");
   console.log(userData);
@@ -40,7 +48,10 @@ export default function Profile() {
   const [admin, setAdmin] = useState(userData.status === "ADMIN");
   const [adminCode, setAdminCode] = useState("");
   const [errors, setErrors] = useState<Errors[]>([]);
-  const { trigger, isMutating, data, error } = useSWRMutation(url, putUser);
+  const { trigger, isMutating, data, error } = useSWRMutation(
+    `${url}/${userData.username}`,
+    putUser
+  );
   const { trigger: removeUser, isMutating: isDeleting } = useSWRMutation(
     url,
     deleteUser
@@ -55,6 +66,7 @@ export default function Profile() {
         email,
         admin,
         adminCode,
+        userToken,
       });
       console.log("=== updateUser result ===");
       console.log(result);
@@ -62,6 +74,11 @@ export default function Profile() {
       console.log(data);
 
       if (result.errors?.length) return setErrors(result.errors);
+      if (result.message) {
+        alert("Error: Invalid edit credentials");
+        throw new Error(result.message);
+      }
+
       localStorage.setItem("gistUserData", JSON.stringify(result));
       router.push("/");
     } catch (error) {
@@ -86,12 +103,17 @@ export default function Profile() {
     );
   }
 
-  async function deleteAccount() {
+  async function deleteAccount(id: string) {
     try {
       if (confirm("Delete your account permanently?")) {
-        const response = await removeUser({ userToken });
+        const result = await removeUser({ id, userToken });
         console.log("=== deleteAccount ===");
-        console.log(response);
+        console.log(result);
+
+        if (result.message) {
+          alert("Error: Invalid delete credentials");
+          throw new Error(result.message);
+        }
 
         localStorage.removeItem("gistToken");
         localStorage.removeItem("streamToken");
@@ -191,16 +213,20 @@ export default function Profile() {
           Update
         </button>
       </form>
-      <hr className="my-5 text-gray-600" />
-      <p className="text-sm text-red-500">Danger Zone</p>
-      <button
-        type="button"
-        disabled={isDeleting}
-        onClick={() => deleteAccount()}
-        className="cursor-pointer rounded-lg border border-solid border-transparent transition-colors bg-foreground text-background hover:bg-red-500 dark:hover:bg-red-500 font-medium text-sm sm:text-base h-10 sm:h-12 mt-3 px-4 sm:px-5"
-      >
-        Delete Account
-      </button>
+      {userData.status !== "ADMIN" && (
+        <>
+          <hr className="my-5 text-gray-600" />
+          <p className="text-sm text-red-500">Danger Zone</p>
+          <button
+            type="button"
+            disabled={isDeleting}
+            onClick={() => deleteAccount(userData.username)}
+            className="cursor-pointer rounded-lg border border-solid border-transparent transition-colors bg-foreground text-background hover:bg-red-500 dark:hover:bg-red-500 font-medium text-sm sm:text-base h-10 sm:h-12 mt-3 px-4 sm:px-5"
+          >
+            Delete Account
+          </button>
+        </>
+      )}
       {isMutating && (
         <div className="my-3 text-sm text-yellow-300">Updating profile...</div>
       )}
