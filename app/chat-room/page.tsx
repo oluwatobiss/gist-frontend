@@ -39,36 +39,23 @@ export default function ChatRoom() {
 
   const [chatClient, setChatClient] = useState<StreamChat | null>(null);
   const [cachedUserData, setCachedUserData] = useState(userData);
-
   if (userData.id !== cachedUserData.id) setCachedUserData(userData);
-
-  console.log("=== ChatRoom ===");
-  console.log(loggedInUser);
-  console.log(chatClient);
 
   useEffect(() => {
     if (!userToken || !loggedInUser) return;
-
     const client = new StreamChat(process.env.NEXT_PUBLIC_STREAM_API_KEY!);
-
-    console.log("=== ChatRoom useEffect ===");
-    console.log(client);
-
     if (
       client.tokenManager.token === userToken &&
       client.userID === cachedUserData.id
     )
       return;
-
     let didUserConnectInterrupt = false;
-
     const connectionPromise = client
       .connectUser(cachedUserData, userToken)
       .then(() => {
         if (!didUserConnectInterrupt) setChatClient(client);
       })
       .catch((e) => console.error(e));
-
     return () => {
       didUserConnectInterrupt = true;
       setChatClient(null);

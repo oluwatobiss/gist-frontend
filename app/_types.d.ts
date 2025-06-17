@@ -32,7 +32,7 @@ type PostUserArg = {
 type PostUserOption = { arg: PostUserArg };
 type PutUserOption = {
   arg: Omit<PostUserArg, "username" | "password"> & {
-    userToken: string | null;
+    userToken: string | false | null;
   };
 };
 type UpsertFetcherOption = { arg: { name: string; imageUrl: string } };

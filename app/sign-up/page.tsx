@@ -23,7 +23,7 @@ export default function SignUp() {
   const [admin, setAdmin] = useState(false);
   const [adminCode, setAdminCode] = useState("");
   const [errors, setErrors] = useState<Errors[]>([]);
-  const { trigger, isMutating, data, error } = useSWRMutation(
+  const { trigger, isMutating, error } = useSWRMutation(
     `${process.env.NEXT_PUBLIC_BACKEND_URI}/users`,
     postUser
   );
@@ -40,14 +40,8 @@ export default function SignUp() {
         admin,
         adminCode,
       });
-      console.log("=== registerUser result ===");
-      console.log(result);
-      console.log("=== registerUser useSWRMutation data  ===");
-      console.log(data);
       result.errors?.length ? setErrors(result.errors) : router.push("/login");
     } catch (error) {
-      console.log("=== registerUser error ===");
-      console.log(error);
       if (error instanceof Error) console.error(error.message);
     }
   }

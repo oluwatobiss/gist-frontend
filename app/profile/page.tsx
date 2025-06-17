@@ -17,7 +17,6 @@ async function putUser(url: string, { arg }: PutUserOption) {
     headers: {
       "Content-type": "application/json; charset=UTF-8",
       Authorization: `Bearer ${arg.userToken}`,
-      // Authorization: `Bearer Test`,
     },
   });
   return await response.json();
@@ -27,19 +26,17 @@ async function deleteUser(url: string, { arg }: { arg: DeleteFetcherOptions }) {
   const response = await fetch(`${url}/${arg.id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${arg.userToken}` },
-    // headers: { Authorization: `Bearer Test` },
   });
   return await response.json();
 }
 
 export default function Profile() {
-  const userToken = localStorage.getItem("gistToken");
-  const userDataJson = localStorage.getItem("gistUserData");
+  const userToken =
+    typeof window !== "undefined" && localStorage.getItem("gistToken");
+  const userDataJson =
+    typeof window !== "undefined" && localStorage.getItem("gistUserData");
   const userData = userDataJson && JSON.parse(userDataJson);
   const url = `${process.env.NEXT_PUBLIC_BACKEND_URI}/users`;
-
-  console.log("=== userData ===");
-  console.log(userData);
 
   const router = useRouter();
   const [firstName, setFirstName] = useState(userData.firstName);
@@ -48,7 +45,7 @@ export default function Profile() {
   const [admin, setAdmin] = useState(userData.status === "ADMIN");
   const [adminCode, setAdminCode] = useState("");
   const [errors, setErrors] = useState<Errors[]>([]);
-  const { trigger, isMutating, data, error } = useSWRMutation(
+  const { trigger, isMutating, error } = useSWRMutation(
     `${url}/${userData.username}`,
     putUser
   );
@@ -68,22 +65,14 @@ export default function Profile() {
         adminCode,
         userToken,
       });
-      console.log("=== updateUser result ===");
-      console.log(result);
-      console.log("=== updateUser useSWRMutation data  ===");
-      console.log(data);
-
       if (result.errors?.length) return setErrors(result.errors);
       if (result.message) {
         alert("Error: Invalid edit credentials");
         throw new Error(result.message);
       }
-
       localStorage.setItem("gistUserData", JSON.stringify(result));
       router.push("/");
     } catch (error) {
-      console.log("=== updateUser error ===");
-      console.log(error);
       if (error instanceof Error) console.error(error.message);
     }
   }
@@ -107,14 +96,10 @@ export default function Profile() {
     try {
       if (confirm("Delete your account permanently?")) {
         const result = await removeUser({ id, userToken });
-        console.log("=== deleteAccount ===");
-        console.log(result);
-
         if (result.message) {
           alert("Error: Invalid delete credentials");
           throw new Error(result.message);
         }
-
         localStorage.removeItem("gistToken");
         localStorage.removeItem("streamToken");
         localStorage.removeItem("gistUserData");

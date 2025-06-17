@@ -13,7 +13,6 @@ import useSWRMutation from "swr/mutation";
 async function getChannels({ url, userToken }: GetFetcherOptions) {
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${userToken}` },
-    // headers: { Authorization: `Bearer Test` },
   });
   return await response.json();
 }
@@ -24,7 +23,6 @@ async function postUserToChannel(url: string, { arg }: SubscriptionOption) {
     {
       method: "POST",
       headers: { Authorization: `Bearer ${arg.userToken}` },
-      // headers: { Authorization: `Bearer Test` },
     }
   );
   return await response.json();
@@ -36,7 +34,6 @@ async function deleteUserFromChannel(url: string, { arg }: SubscriptionOption) {
     {
       method: "DELETE",
       headers: { Authorization: `Bearer ${arg.userToken}` },
-      // headers: { Authorization: `Bearer Test` },
     }
   );
   return await response.json();
@@ -49,7 +46,6 @@ async function deleteChannel(
   const response = await fetch(`${url}/${arg.id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${arg.userToken}` },
-    // headers: { Authorization: `Bearer Test` },
   });
   return await response.json();
 }
@@ -72,22 +68,14 @@ export default function Channels() {
   const { trigger: subscribe } = useSWRMutation(url, postUserToChannel);
   const { trigger: unsubscribe } = useSWRMutation(url, deleteUserFromChannel);
 
-  console.log("=== Channel Data from GET request ===");
-  console.log(data);
-
   async function removeChannel(id: string) {
     try {
       if (confirm("Delete channel permanently?")) {
         const result = await trigger({ id, userToken });
-
-        console.log("=== Deleted channel's data ===");
-        console.log(result);
-
         if (result.message) {
           alert("Error: Invalid delete credentials");
           throw new Error(result.message);
         }
-
         window.location.reload();
       }
     } catch (error) {
@@ -102,14 +90,10 @@ export default function Channels() {
         username: loggedInUser.username,
         userToken,
       });
-      console.log("=== subscribeToChannel ===");
-      console.log(result);
-
       if (result.message) {
         alert("Error: Invalid subscription credentials");
         throw new Error(result.message);
       }
-
       mutate();
       // Use state setter function to re-render component
       members[1](result);
@@ -129,14 +113,10 @@ export default function Channels() {
           username: loggedInUser.username,
           userToken,
         });
-        console.log("=== unsubscribeFromChannel ===");
-        console.log(result);
-
         if (result.message) {
           alert("Error: Invalid unsubscription credentials");
           throw new Error(result.message);
         }
-
         mutate();
         members[1](result);
       }
@@ -146,9 +126,6 @@ export default function Channels() {
   }
 
   async function editChannel(channel: Channel) {
-    console.log("=== editChannel function ===");
-    console.log(channel);
-
     localStorage.setItem("gistChannelToEdit", JSON.stringify(channel));
     router.push("/edit-channel");
   }

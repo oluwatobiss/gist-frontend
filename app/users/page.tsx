@@ -7,7 +7,6 @@ import useSWRMutation from "swr/mutation";
 async function getUsers({ url, userToken }: GetFetcherOptions) {
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${userToken}` },
-    // headers: { Authorization: `Bearer Test` },
   });
   return await response.json();
 }
@@ -16,7 +15,6 @@ async function deleteUser(url: string, { arg }: { arg: DeleteFetcherOptions }) {
   const response = await fetch(`${url}/${arg.id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${arg.userToken}` },
-    // headers: { Authorization: `Bearer Test` },
   });
   return await response.json();
 }
@@ -40,15 +38,10 @@ export default function Users() {
     try {
       if (confirm("Delete user permanently?")) {
         const result = await trigger({ id, userToken });
-
-        console.log("=== Deleted user's data ===");
-        console.log(result);
-
         if (result.message) {
           alert("Error: Invalid delete credentials");
           throw new Error(result.message);
         }
-
         window.location.reload();
       }
     } catch (error) {
