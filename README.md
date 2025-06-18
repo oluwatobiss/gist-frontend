@@ -113,7 +113,7 @@ npm run dev
 
 ## Live Demo
 
-- https://gist.netlify.app/
+- https://gist-social.netlify.app/
 
 ## Related Repos
 
